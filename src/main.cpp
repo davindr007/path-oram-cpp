@@ -1,3 +1,4 @@
+// src/main.cpp
 #include "oram_tree.hpp"
 #include "position_map.hpp"
 #include "stash.hpp"
@@ -14,11 +15,13 @@ int main() {
     ORAMTree tree(height, Z);
     PositionMap pos_map(tree.getLeafNodeCount());
 
-    // ✅ Pre-assign leaves to block IDs (very important!)
+    // ✅ Pre-assign leaves to block IDs
     for (int i = 1; i <= 3; ++i) {
         pos_map.assignNewLeaf(i);
         std::cout << "[SETUP] Assigned Block " << i << " → Leaf " << pos_map.getLeaf(i) << "\n";
     }
+
+    std::cout << "[DEBUG] Tree has " << tree.tree.size() << " nodes\n";
 
     Accessor oram(tree, pos_map);
 
@@ -47,7 +50,7 @@ int main() {
     result = oram.access(3, READ);
     std::cout << "Read Block 3: " << result << "\n";
 
-    // Print final tree path for Block 1’s new leaf
+    // Print final tree path
     int leaf = pos_map.getLeaf(1);
     std::cout << "\n[PRINT PATH to Leaf " << leaf << "]\n";
     tree.printPath(leaf);
