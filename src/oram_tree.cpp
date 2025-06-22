@@ -18,13 +18,15 @@ int ORAMTree::getNodeIndex(int level, int offset) const {
 std::vector<int> ORAMTree::getPathIndexes(int leaf) const {
     std::vector<int> path;
     int index = leaf + (1 << height) - 1;
+    std::cout << "[DEBUG] getPathIndexes: leaf=" << leaf << ", start index=" << index << "\n";
     while (index >= 0) {
         path.push_back(index);
-        index = (index - 1) / 2; // Move to parent
+        index = (index - 1) / 2;
     }
     std::reverse(path.begin(), path.end());
     return path;
 }
+
 
 void ORAMTree::printPath(int leaf) const {
     auto path = getPathIndexes(leaf);
