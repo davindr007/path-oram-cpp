@@ -14,25 +14,40 @@ int main() {
     ORAMTree tree(height, Z);
     PositionMap pos_map(tree.getLeafNodeCount());
 
-    // Pre-assign leaf for blocks
-    for (int i = 1; i <= 3; ++i)
+    // ✅ Pre-assign leaves to block IDs (very important!)
+    for (int i = 1; i <= 3; ++i) {
         pos_map.assignNewLeaf(i);
+        std::cout << "[SETUP] Assigned Block " << i << " → Leaf " << pos_map.getLeaf(i) << "\n";
+    }
 
     Accessor oram(tree, pos_map);
 
     // WRITE operations
     std::cout << "\n[WRITE BLOCKS]\n";
-    std::cout << "Write Block 1 → A: " << oram.access(1, WRITE, "A") << "\n";
-    std::cout << "Write Block 2 → B: " << oram.access(2, WRITE, "B") << "\n";
-    std::cout << "Write Block 3 → C: " << oram.access(3, WRITE, "C") << "\n";
+
+    std::string result;
+    result = oram.access(1, WRITE, "A");
+    std::cout << "Write Block 1 → A: " << result << "\n";
+
+    result = oram.access(2, WRITE, "B");
+    std::cout << "Write Block 2 → B: " << result << "\n";
+
+    result = oram.access(3, WRITE, "C");
+    std::cout << "Write Block 3 → C: " << result << "\n";
 
     // READ operations
     std::cout << "\n[READ BLOCKS]\n";
-    std::cout << "Read Block 1: " << oram.access(1, READ) << "\n";
-    std::cout << "Read Block 2: " << oram.access(2, READ) << "\n";
-    std::cout << "Read Block 3: " << oram.access(3, READ) << "\n";
 
-    // Print tree path for Block 1’s new leaf
+    result = oram.access(1, READ);
+    std::cout << "Read Block 1: " << result << "\n";
+
+    result = oram.access(2, READ);
+    std::cout << "Read Block 2: " << result << "\n";
+
+    result = oram.access(3, READ);
+    std::cout << "Read Block 3: " << result << "\n";
+
+    // Print final tree path for Block 1’s new leaf
     int leaf = pos_map.getLeaf(1);
     std::cout << "\n[PRINT PATH to Leaf " << leaf << "]\n";
     tree.printPath(leaf);
