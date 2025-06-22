@@ -4,22 +4,26 @@
 Accessor::Accessor(ORAMTree& t, PositionMap& p) : tree(t), pos_map(p) {}
 
 std::string Accessor::access(int block_id, AccessType type, std::string new_data) {
-    // 1. Get current leaf from position map
+    std::cout << "[ACCESS] Start: Block " << block_id << ", Type: " << (type == READ ? "READ" : "WRITE") << "\n";
+
     int old_leaf = pos_map.getLeaf(block_id);
+    std::cout << "[ACCESS] Old Leaf: " << old_leaf << "\n";
 
-    // 2. Get full path indexes
     auto path = tree.getPathIndexes(old_leaf);
+    std::cout << "[ACCESS] Path Indexes: ";
+    for (int idx : path) std::cout << idx << " ";
+    std::cout << "\n";
 
-    // 3. Move blocks from path into stash
+    // Step 3: read path into stash
     for (int index : path) {
         for (const auto& b : tree.tree[index].blocks) {
             if (!b.is_dummy)
                 stash.addBlock(b);
         }
-        tree.tree[index] = Bucket(tree.Z); // Reset bucket (empty with dummies)
+        tree.tree[index] = Bucket(tree.Z); // clear bucket
     }
+    std::cout << "[ACCESS] Path loaded into stash\n";
 
-    // 4. Read or write in stash
     std::string result = "NOT FOUND";
     auto block_opt = stash.getBlock(block_id);
 
@@ -31,13 +35,16 @@ std::string Accessor::access(int block_id, AccessType type, std::string new_data
         stash.addBlock(Block(block_id, new_data, false));
         result = "WRITE DONE";
     }
+    std::cout << "[ACCESS] Block handled in stash: " << result << "\n";
 
-    // 5. Assign a new leaf for the block
     pos_map.assignNewLeaf(block_id);
     int new_leaf = pos_map.getLeaf(block_id);
     auto new_path = tree.getPathIndexes(new_leaf);
 
-    // 6. Evict blocks from stash back to tree path
+    std::cout << "[ACCESS] New Leaf: " << new_leaf << ", Path: ";
+    for (int idx : new_path) std::cout << idx << " ";
+    std::cout << "\n";
+
     auto stash_blocks = stash.getAllBlocks();
     int z = tree.Z;
 
@@ -51,5 +58,6 @@ std::string Accessor::access(int block_id, AccessType type, std::string new_data
         }
     }
 
+    std::cout << "[ACCESS] Eviction complete\n";
     return result;
 }
