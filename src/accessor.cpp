@@ -1,6 +1,6 @@
 #include "accessor.hpp"
 #include <algorithm>
-
+#include <iostream>
 Accessor::Accessor(ORAMTree& t, PositionMap& p) : tree(t), pos_map(p) {}
 
 std::string Accessor::access(int block_id, AccessType type, std::string new_data) {
