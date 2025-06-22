@@ -14,13 +14,12 @@ std::string Accessor::access(int block_id, AccessType type, std::string new_data
     for (int idx : path) std::cout << idx << " ";
     std::cout << "\n";
 
-    // Step 3: read path into stash
     for (int index : path) {
         for (const auto& b : tree.tree[index].blocks) {
             if (!b.is_dummy)
                 stash.addBlock(b);
         }
-        tree.tree[index] = Bucket(tree.Z); // clear bucket
+        tree.tree[index] = Bucket(tree.Z);
     }
     std::cout << "[ACCESS] Path loaded into stash\n";
 
