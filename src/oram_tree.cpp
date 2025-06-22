@@ -19,10 +19,12 @@ std::vector<int> ORAMTree::getPathIndexes(int leaf) const {
     std::vector<int> path;
     int index = leaf + (1 << height) - 1;
     std::cout << "[DEBUG] getPathIndexes: leaf=" << leaf << ", start index=" << index << "\n";
-    while (index >= 0) {
+
+    while (index > 0) {
         path.push_back(index);
         index = (index - 1) / 2;
     }
+    path.push_back(0); // Add the root node
     std::reverse(path.begin(), path.end());
     return path;
 }
