@@ -3,28 +3,27 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Iinclude
 
 # ==== Source Files ====
-SRCS = main.cpp accessor.cpp oram_tree.cpp position_map.cpp stash.cpp bucket.cpp
+SRCS = src/main.cpp src/accessor.cpp src/oram_tree.cpp src/stash.cpp src/bucket.cpp src/position_map.cpp
 OBJS = $(SRCS:.cpp=.o)
-TARGET = pathoram
+TARGET = oram
 
 # ==== Default Target ====
 all: $(TARGET)
 
-# ==== Link Object Files into Executable ====
+# ==== Link Object Files ====
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 # ==== Compile Each .cpp to .o ====
-%.o: %.cpp
+src/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # ==== Run Program ====
 run: all
 	./$(TARGET) --demo=true
 
-# ==== Clean Build Files ====
+# ==== Clean Up ====
 clean:
 	rm -f $(OBJS) $(TARGET)
 
 .PHONY: all clean run
-
