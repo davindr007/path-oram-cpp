@@ -12,6 +12,6 @@ public:
     std::optional<Block> getBlock(int id);
     void removeBlock(int id);
     std::vector<Block> getAllBlocks() const;
-    int getSize() const;  
+
     void print() const;
 };
