@@ -48,8 +48,8 @@ std::string Accessor::access(int block_id, AccessType type, std::string new_data
     int z = tree.Z;
 
     for (int idx : new_path) {
-        for (int i = 0; i < stash_blocks.size(); ++i) {
-            if (tree.tree[idx].blocks.size() < z) {
+        for (size_t i = 0; i < stash_blocks.size(); ++i) {
+            if (tree.tree[idx].blocks.size() < static_cast<size_t>(z)) {
                 tree.tree[idx].addBlock(stash_blocks[i]);
                 stash_blocks.erase(stash_blocks.begin() + i);
                 --i;
