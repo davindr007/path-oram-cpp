@@ -60,3 +60,6 @@ std::string Accessor::access(int block_id, AccessType type, std::string new_data
     std::cout << "[ACCESS] Eviction complete\n";
     return result;
 }
+int Accessor::getStashSize() const {
+    return stash.getSize();
+}
