@@ -15,5 +15,5 @@ private:
 public:
     Accessor(ORAMTree& t, PositionMap& p);
     std::string access(int block_id, AccessType type, std::string new_data = "");
-    int getStashSize() const;
+
 };
