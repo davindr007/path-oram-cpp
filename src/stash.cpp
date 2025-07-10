@@ -32,3 +32,7 @@ void Stash::print() const {
     }
     std::cout << "\n";
 }
+int Stash::getSize() const {
+    return buffer.size();
+}
+
