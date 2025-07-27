@@ -1,14 +1,15 @@
-#pragma once
 #include "block.hpp"
 #include <vector>
 
 class Bucket {
 public:
-    int Z; // Max number of blocks in a bucket
     std::vector<Block> blocks;
+    int maxSize;
 
-    Bucket(int z = 4); // Constructor
+    Bucket(int z);
 
-    void addBlock(const Block& block);  // Add block into the bucket
-    void print() const;                 // Print bucket contents
+    bool insert(const Block& block);
+    std::vector<Block> getBlocks() const;
+    void clear();
 };
+
