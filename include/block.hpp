@@ -1,11 +1,12 @@
-#pragma once
 #include <string>
-
-struct Block {
+enum BlockOp { READ, WRITE };
+class Block {
+public:
     int id;
     std::string data;
-    bool is_dummy;
+    bool isDummy;
 
-    Block(int id = -1, std::string d = "", bool dummy = true)
-        : id(id), data(d), is_dummy(dummy) {}
+    Block(int i = -1, const std::string& d = "", bool dummy = true)
+        : id(i), data(d), isDummy(dummy) {}
 };
+
