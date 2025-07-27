@@ -1,16 +1,11 @@
 #ifndef ACCESSOR_HPP
 #define ACCESSOR_HPP
-
 #include "oram_tree.hpp"
-#include <string>
-
-class Accessor {
-private:
-    ORAMTree* tree;
-
+class ORAMAccessor {
+    ORAMTree oram;
 public:
-    Accessor(ORAMTree* tree);
-    void performAccess(const std::string& id, const std::string& data, const std::string& op);
+    ORAMAccessor(int levels) : oram(levels) {}
+    std::vector<int> read(int id) { return oram.read(id); }
+    void write(int id, const std::vector<int>& data) { oram.write(id, data); }
 };
-
 #endif
