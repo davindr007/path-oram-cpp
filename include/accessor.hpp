@@ -1,4 +1,5 @@
 #pragma once
+
 #include "oram_tree.hpp"
 #include "position_map.hpp"
 #include "stash.hpp"
@@ -13,7 +14,7 @@ private:
     Stash stash;
 
 public:
-    Accessor(ORAMTree& t, PositionMap& p);
-    std::string access(int block_id, AccessType type, std::string new_data = "");
+    Accessor(ORAMTree& t, PositionMap& p) : tree(t), pos_map(p) {}
 
+    std::string access(int block_id, AccessType type, const std::string& new_data = "");
 };
