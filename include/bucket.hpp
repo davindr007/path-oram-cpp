@@ -16,5 +16,6 @@ public:
         blocks.clear();
         return temp;
     }
+    bool is_full() const { return blocks.size() >= Z; }
 };
 #endif
