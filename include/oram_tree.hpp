@@ -1,21 +1,27 @@
+#ifndef ORAM_TREE_HPP
+#define ORAM_TREE_HPP
+
 #include "bucket.hpp"
-#include "block.hpp"
+#include "position_map.hpp"
+#include "stash.hpp"
 #include <vector>
+#include <string>
 
 class ORAMTree {
 private:
     int height;
-    int Z;
     std::vector<Bucket> tree;
+    PositionMap posMap;
+    Stash stash;
 
-    int getNodeIndex(int level, int index) const;
-    std::vector<int> pathToRoot(int leaf) const;
+    int getLeafIndex(int leaf) const;
+    std::vector<int> getPathIndices(int leaf) const;
 
 public:
-    ORAMTree(int h, int z);
+    ORAMTree(int height);
 
-    std::vector<Block> readPath(int leaf) const;
-    void writePath(int leaf, const std::vector<Block>& path);
-    bool insertBlockAtLeaf(int leaf, const Block& block);
+    void access(const std::string& id, const std::string& data, const std::string& op);
+    void printPath(int leaf) const;
 };
 
+#endif
