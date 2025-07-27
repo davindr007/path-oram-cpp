@@ -5,7 +5,7 @@
 #include "stash.hpp"
 #include <string>
 
-enum AccessType { READ, WRITE };
+enum BlockOp { READ, WRITE };
 
 class Accessor {
 private:
