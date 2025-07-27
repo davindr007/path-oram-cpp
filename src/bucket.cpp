@@ -1,31 +1,36 @@
 #include "bucket.hpp"
 
-Bucket::Bucket(int z) {
-    for (int i = 0; i < z; ++i) {
-        blocks.emplace_back();  // default dummy blocks
+Bucket::Bucket(int Z) {
+    for (int i = 0; i < Z; ++i) {
+        blocks.emplace_back();
     }
 }
 
-bool Bucket::insert(const Block& block) {
-    for (auto& b : blocks) {
-        if (b.is_dummy) {
+bool Bucket::addBlock(const Block &block) {
+    for (auto &b : blocks) {
+        if (b.isDummy) {
             b = block;
             return true;
         }
     }
-    return false;  // No space to insert
+    return false;
 }
 
-std::vector<Block> Bucket::get_blocks() const {
-    return blocks;
-}
-
-void Bucket::set_blocks(const std::vector<Block>& new_blocks) {
-    blocks = new_blocks;
+Block Bucket::getBlock(int id) const {
+    for (const auto &b : blocks) {
+        if (!b.isDummy && b.id == id) {
+            return b;
+        }
+    }
+    return Block();  // return dummy if not found
 }
 
 void Bucket::clear() {
-    for (auto& block : blocks) {
-        block = Block();  // reset to dummy
+    for (auto &b : blocks) {
+        b = Block();  // reset to dummy
     }
+}
+
+std::vector<Block> Bucket::getAllBlocks() const {
+    return blocks;
 }
