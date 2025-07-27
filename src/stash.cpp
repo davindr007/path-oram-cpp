@@ -1,36 +1,31 @@
 #include "stash.hpp"
-#include <iostream>
+#include <algorithm> // for std::find_if
 
-void Stash::addBlock(const Block& block) {
-    buffer.push_back(block);
+void Stash::add_block(const Block& block) {
+    blocks.push_back(block);
 }
 
-std::optional<Block> Stash::getBlock(int id) {
-    for (const auto& b : buffer) {
-        if (!b.is_dummy && b.id == id)
-            return b;
+Block Stash::get_block(int block_id, bool& found) {
+    for (auto it = blocks.begin(); it != blocks.end(); ++it) {
+        if (it->id == block_id) {
+            Block result = *it;
+            blocks.erase(it);
+            found = true;
+            return result;
+        }
     }
-    return std::nullopt;
+    found = false;
+    return Block(); // Return dummy block if not found
 }
 
-void Stash::removeBlock(int id) {
-    buffer.erase(
-        std::remove_if(buffer.begin(), buffer.end(),
-                       [id](const Block& b) { return !b.is_dummy && b.id == id; }),
-        buffer.end()
-    );
+std::vector<Block> Stash::get_all_blocks() const {
+    return blocks;
 }
 
-std::vector<Block> Stash::getAllBlocks() const {
-    return buffer;
+void Stash::set_blocks(const std::vector<Block>& new_blocks) {
+    blocks = new_blocks;
 }
 
-void Stash::print() const {
-    std::cout << "Stash: ";
-    for (const auto& b : buffer) {
-        std::cout << (b.is_dummy ? "[dummy]" : "[ID: " + std::to_string(b.id) + "]") << " ";
-    }
-    std::cout << "\n";
+void Stash::clear() {
+    blocks.clear();
 }
-
-
