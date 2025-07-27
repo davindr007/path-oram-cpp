@@ -1,36 +1,18 @@
-#include "bucket.hpp"
+#include "block.hpp"
+#include <sstream>
 
-Bucket::Bucket(int Z) {
-    for (int i = 0; i < Z; ++i) {
-        blocks.emplace_back();
-    }
-}
+Block::Block(int id, const std::vector<uint8_t>& data, int leaf_id) 
+    : id(id), data(data), leaf_id(leaf_id) {}
 
-bool Bucket::addBlock(const Block &block) {
-    for (auto &b : blocks) {
-        if (b.isDummy) {
-            b = block;
-            return true;
-        }
-    }
-    return false;
-}
+bool Block::is_dummy() const { return id == -1; }
 
-Block Bucket::getBlock(int id) const {
-    for (const auto &b : blocks) {
-        if (!b.isDummy && b.id == id) {
-            return b;
-        }
-    }
-    return Block();  // return dummy if not found
-}
+size_t Block::size() const { return data.size(); }
 
-void Bucket::clear() {
-    for (auto &b : blocks) {
-        b = Block();  // reset to dummy
-    }
-}
-
-std::vector<Block> Bucket::getAllBlocks() const {
-    return blocks;
+std::string Block::to_string() const {
+    std::ostringstream oss;
+    oss << "Block[id=" << id 
+        << ", leaf=" << leaf_id 
+        << ", size=" << data.size() 
+        << ", data=" << (is_dummy() ? "DUMMY" : "REAL") << "]";
+    return oss.str();
 }
