@@ -1,51 +1,37 @@
 #include <iostream>
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <string.h>
+#include <string>
+#include <cstring>
 
-#define SERVER_IP "127.0.0.1"
 #define PORT 8080
-#define BUFFER_SIZE 4096
 
 int main() {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        std::cerr << "Failed to create socket\n";
-        return 1;
-    }
+    int sock = 0;
+    struct sockaddr_in serv_addr;
+    char buffer[1024] = {0};
 
-    sockaddr_in server_addr{};
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(PORT);
-    inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr);
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);
 
-    if (connect(sock, (sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        std::cerr << "Connection failed\n";
-        return 1;
-    }
+    connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    std::cout << "Connected to server.\n";
 
-    while (true) {
-        std::string command;
-        std::cout << "Enter command (read <id> / write <id> <data> / exit): ";
-        std::getline(std::cin, command);
+    // test write
+    std::string write_msg = "WRITE 42 HelloWorld";
+    send(sock, write_msg.c_str(), write_msg.size(), 0);
+    read(sock, buffer, 1024);
+    std::cout << "Write response: " << buffer << std::endl;
 
-        if (command == "exit") break;
-
-        // Send command to server
-        send(sock, command.c_str(), command.size(), 0);
-
-        // Read response
-        char buffer[BUFFER_SIZE] = {0};
-        int valread = read(sock, buffer, BUFFER_SIZE - 1);
-        if (valread <= 0) {
-            std::cerr << "Server disconnected or error.\n";
-            break;
-        }
-
-        std::cout << "Server response: " << buffer << "\n";
-    }
+    // test read
+    std::string read_msg = "READ 42";
+    send(sock, read_msg.c_str(), read_msg.size(), 0);
+    memset(buffer, 0, sizeof(buffer));
+    read(sock, buffer, 1024);
+    std::cout << "Read response: " << buffer << std::endl;
 
     close(sock);
     return 0;
