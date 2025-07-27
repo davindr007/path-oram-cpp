@@ -1,13 +1,18 @@
-#pragma once
-#include <string>
-enum BlockOp { READ, WRITE };
-class Block {
-public:
-    int id;
-    std::string data;
-    bool isDummy;
+#ifndef BLOCK_HPP
+#define BLOCK_HPP
 
-    Block(int i = -1, const std::string& d = "", bool dummy = true)
-        : id(i), data(d), isDummy(dummy) {}
+#include <string>
+
+struct Block {
+    int id;             // Block ID
+    std::string data;   // Simple payload
+
+    Block(int id = -1, const std::string& data = "")
+        : id(id), data(data) {}
+
+    bool isDummy() const {
+        return id == -1;
+    }
 };
 
+#endif
