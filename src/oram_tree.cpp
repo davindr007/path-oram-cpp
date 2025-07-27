@@ -1,39 +1,82 @@
 #include "oram_tree.hpp"
+#include <cmath>
 #include <iostream>
 #include <algorithm>
 
 ORAMTree::ORAMTree(int h, int z) : height(h), Z(z) {
-    int total_nodes = std::pow(2, height + 1) - 1;
-    tree = std::vector<Bucket>(total_nodes, Bucket(Z));
+    num_leaves = 1 << height; // 2^height
+    tree.resize((1 << (height + 1)) - 1); // Full binary tree node count
+    for (auto &bucket : tree)
+        bucket = Bucket(Z);
 }
 
-int ORAMTree::getLeafNodeCount() const {
-    return std::pow(2, height);
-}
+std::vector<Block> ORAMTree::read_path(int leaf) {
+    std::vector<Block> path;
+    int index = 0;
 
-int ORAMTree::getNodeIndex(int level, int offset) const {
-    return std::pow(2, level) - 1 + offset;
-}
-
-std::vector<int> ORAMTree::getPathIndexes(int leaf) const {
-    std::vector<int> path;
-    int index = leaf + (1 << height) - 1;
-    std::cout << "[DEBUG] getPathIndexes: leaf=" << leaf << ", start index=" << index << "\n";
-
-    while (index > 0) {
-        path.push_back(index);
-        index = (index - 1) / 2;
+    for (int level = 0; level <= height; level++) {
+        path.push_back(tree[index].get_blocks());
+        index = 2 * index + 1 + ((leaf >> (height - level)) & 1);
     }
-    path.push_back(0); // Add the root node
-    std::reverse(path.begin(), path.end());
+
     return path;
 }
 
+void ORAMTree::write_path(int leaf, const std::vector<Block> &path_blocks) {
+    int index = 0;
+    int block_index = 0;
 
-void ORAMTree::printPath(int leaf) const {
-    auto path = getPathIndexes(leaf);
-    for (int i : path) {
-        std::cout << "Bucket " << i << ": ";
-        tree[i].print();
+    for (int level = 0; level <= height; level++) {
+        std::vector<Block> new_bucket;
+        for (int i = 0; i < Z && block_index < path_blocks.size(); i++, block_index++) {
+            new_bucket.push_back(path_blocks[block_index]);
+        }
+        tree[index].set_blocks(new_bucket);
+        index = 2 * index + 1 + ((leaf >> (height - level)) & 1);
     }
+}
+
+std::vector<int> ORAMTree::get_path(int leaf) {
+    std::vector<int> path;
+    int index = 0;
+
+    for (int level = 0; level <= height; level++) {
+        path.push_back(index);
+        index = 2 * index + 1 + ((leaf >> (height - level)) & 1);
+    }
+
+    return path;
+}
+
+Block ORAMTree::access(const std::string &op, int id, const std::string &data) {
+    int old_leaf = position_map.get_position(id);
+    int new_leaf = rand() % num_leaves;
+    position_map.set_position(id, new_leaf);
+
+    std::vector<int> path = get_path(old_leaf);
+    for (int node : path) {
+        std::vector<Block> bucket_blocks = tree[node].get_blocks();
+        for (const auto &blk : bucket_blocks) {
+            if (!blk.is_dummy)
+                stash.add_block(blk);
+        }
+    }
+
+    Block result;
+    if (op == "READ") {
+        result = stash.read_block(id);
+    } else if (op == "WRITE") {
+        Block new_block(id, data);
+        stash.write_block(new_block);
+        result = new_block;
+    }
+
+    // Refill buckets from stash (from bottom to root)
+    for (int i = path.size() - 1; i >= 0; i--) {
+        std::vector<Block> candidates = stash.get_blocks_on_path(path[i], height, Z);
+        tree[path[i]].set_blocks(candidates);
+        stash.remove_blocks(candidates);
+    }
+
+    return result;
 }
