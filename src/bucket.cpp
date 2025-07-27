@@ -1,27 +1,31 @@
 #include "bucket.hpp"
-#include <iostream>
 
-Bucket::Bucket(int z) : Z(z) {
-    // Fill the bucket with Z dummy blocks
-    for (int i = 0; i < Z; ++i)
-        blocks.push_back(Block()); // Default is_dummy = true
+Bucket::Bucket(int z) {
+    for (int i = 0; i < z; ++i) {
+        blocks.emplace_back();  // default dummy blocks
+    }
 }
 
-void Bucket::addBlock(const Block& block) {
-    // Replace the first dummy block
-    for (int i = 0; i < Z; ++i) {
-        if (blocks[i].is_dummy) {
-            blocks[i] = block;
-            return;
+bool Bucket::insert(const Block& block) {
+    for (auto& b : blocks) {
+        if (b.is_dummy) {
+            b = block;
+            return true;
         }
     }
-    // Bucket is full, block is ignored (can improve later)
+    return false;  // No space to insert
 }
 
-void Bucket::print() const {
-    for (const auto& b : blocks) {
-        std::cout << (b.is_dummy ? "[dummy]" : "[ID: " + std::to_string(b.id) + "]") << " ";
+std::vector<Block> Bucket::get_blocks() const {
+    return blocks;
+}
+
+void Bucket::set_blocks(const std::vector<Block>& new_blocks) {
+    blocks = new_blocks;
+}
+
+void Bucket::clear() {
+    for (auto& block : blocks) {
+        block = Block();  // reset to dummy
     }
-    std::cout << "\n";
 }
-
