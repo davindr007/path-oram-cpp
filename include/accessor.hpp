@@ -3,8 +3,6 @@
 
 #include "block.hpp"
 
-enum class BlockOp { READ, WRITE };  // Unified enum
-
 class Accessor {
 private:
     int leaf;
