@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 enum BlockOp { READ, WRITE };
 class Block {
