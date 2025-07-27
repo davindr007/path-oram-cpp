@@ -1,8 +1,9 @@
-#pragma once
+#ifndef STASH_HPP
+#define STASH_HPP
 
 #include "block.hpp"
 #include <vector>
-#include <algorithm>
+#include <string>
 
 class Stash {
 private:
@@ -13,32 +14,19 @@ public:
         blocks.push_back(block);
     }
 
-    bool contains(int block_id) {
-        for (const auto& block : blocks) {
-            if (block.id == block_id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    Block getBlock(int block_id) {
+    Block getBlock(const std::string& id) {
         for (auto it = blocks.begin(); it != blocks.end(); ++it) {
-            if (it->id == block_id) {
+            if (it->id == id) {
                 Block found = *it;
                 blocks.erase(it);
                 return found;
             }
         }
-        return Block(-1, "");  // Not found
+        return Block{"", ""}; // Return empty block if not found
     }
 
-    std::vector<Block> getAllBlocks() {
+    std::vector<Block> getAllBlocks() const {
         return blocks;
-    }
-
-    void setBlocks(const std::vector<Block>& new_blocks) {
-        blocks = new_blocks;
     }
 
     void clear() {
@@ -46,3 +34,4 @@ public:
     }
 };
 
+#endif
