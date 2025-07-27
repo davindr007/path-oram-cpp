@@ -6,8 +6,8 @@ HDR = accessor.hpp block.hpp bucket.hpp oram_tree.hpp position_map.hpp stash.hpp
 
 all: local client server
 
-local: main.cpp $(SRC) $(HDR)
-	$(CXX) $(CXXFLAGS) -o local main.cpp $(SRC)
+local_main: main.cpp $(SRC) $(HDR)
+	$(CXX) $(CXXFLAGS) -o local_main main.cpp $(SRC)
 
 client: client.cpp $(SRC) $(HDR)
 	$(CXX) $(CXXFLAGS) -o client client.cpp $(SRC)
@@ -16,4 +16,4 @@ server: server.cpp $(SRC) $(HDR)
 	$(CXX) $(CXXFLAGS) -o server server.cpp $(SRC)
 
 clean:
-	rm -f local client server
+	rm -f local_main client server
