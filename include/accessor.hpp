@@ -1,20 +1,16 @@
 #ifndef ACCESSOR_HPP
 #define ACCESSOR_HPP
 
-#include "block.hpp"
+#include "oram_tree.hpp"
+#include <string>
 
 class Accessor {
 private:
-    int leaf;
-    Block block;
-    BlockOp op;
+    ORAMTree* tree;
 
 public:
-    Accessor(int leaf, const Block &block, BlockOp op);
-    
-    int getLeaf() const;
-    Block getBlock() const;
-    BlockOp getOp() const;
+    Accessor(ORAMTree* tree);
+    void performAccess(const std::string& id, const std::string& data, const std::string& op);
 };
 
-#endif // ACCESSOR_HPP
+#endif
