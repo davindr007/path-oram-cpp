@@ -1,21 +1,19 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -O2 -Iinclude
-SRC = src
-OBJ = build
-BIN = oram
+CXXFLAGS = -std=c++17 -O2
 
-SOURCES = $(wildcard $(SRC)/*.cpp)
-OBJECTS = $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SOURCES))
+SRC = accessor.cpp bucket.cpp oram_tree.cpp position_map.cpp stash.cpp
+HDR = accessor.hpp block.hpp bucket.hpp oram_tree.hpp position_map.hpp stash.hpp
 
-$(BIN): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+all: local client server
 
-$(OBJ)/%.o: $(SRC)/%.cpp
-	mkdir -p $(OBJ)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+local: main.cpp $(SRC) $(HDR)
+	$(CXX) $(CXXFLAGS) -o local main.cpp $(SRC)
 
-run: $(BIN)
-	./$(BIN)
+client: client.cpp $(SRC) $(HDR)
+	$(CXX) $(CXXFLAGS) -o client client.cpp $(SRC)
+
+server: server.cpp $(SRC) $(HDR)
+	$(CXX) $(CXXFLAGS) -o server server.cpp $(SRC)
 
 clean:
-	rm -rf $(OBJ) $(BIN)
+	rm -f local client server
