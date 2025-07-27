@@ -1,18 +1,25 @@
+#ifndef POSITION_MAP_HPP
+#define POSITION_MAP_HPP
+
 #include <unordered_map>
-#include <random>
+#include <string>
 
 class PositionMap {
 private:
-    std::unordered_map<int, int> pos_map;
-    int num_leaves;
-    std::mt19937 gen;
-    std::uniform_int_distribution<> dist;
+    std::unordered_map<std::string, int> posMap;
 
 public:
-    PositionMap(int num_blocks, int num_leaves);
+    void setPosition(const std::string& id, int pos) {
+        posMap[id] = pos;
+    }
 
-    int getLeaf(int block_id);
-    void setLeaf(int block_id, int leaf);
-    int getRandomLeaf();
+    int getPosition(const std::string& id) const {
+        auto it = posMap.find(id);
+        if (it != posMap.end()) {
+            return it->second;
+        }
+        return -1; // Not found
+    }
 };
 
+#endif
