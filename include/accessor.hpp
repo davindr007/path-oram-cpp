@@ -1,20 +1,22 @@
-#pragma once
+#ifndef ACCESSOR_HPP
+#define ACCESSOR_HPP
 
-#include "oram_tree.hpp"
-#include "position_map.hpp"
-#include "stash.hpp"
-#include <string>
+#include "block.hpp"
 
-enum BlockOp { READ, WRITE };
+enum class BlockOp { READ, WRITE };  // Unified enum
 
 class Accessor {
 private:
-    ORAMTree& tree;
-    PositionMap& pos_map;
-    Stash stash;
+    int leaf;
+    Block block;
+    BlockOp op;
 
 public:
-    Accessor(ORAMTree& t, PositionMap& p) : tree(t), pos_map(p) {}
-
-    std::string access(int block_id, AccessType type, const std::string& new_data = "");
+    Accessor(int leaf, const Block &block, BlockOp op);
+    
+    int getLeaf() const;
+    Block getBlock() const;
+    BlockOp getOp() const;
 };
+
+#endif // ACCESSOR_HPP
