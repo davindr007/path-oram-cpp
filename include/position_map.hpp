@@ -1,13 +1,18 @@
-#pragma once
 #include <unordered_map>
-#include <cstdlib>
+#include <random>
 
 class PositionMap {
-public:
-    std::unordered_map<int, int> pos_map; // block_id → leaf index
-    int max_leaf;
+private:
+    std::unordered_map<int, int> pos_map;
+    int num_leaves;
+    std::mt19937 gen;
+    std::uniform_int_distribution<> dist;
 
-    PositionMap(int num_leaves);
+public:
+    PositionMap(int num_blocks, int num_leaves);
+
     int getLeaf(int block_id);
-    void assignNewLeaf(int block_id);
+    void setLeaf(int block_id, int leaf);
+    int getRandomLeaf();
 };
+
