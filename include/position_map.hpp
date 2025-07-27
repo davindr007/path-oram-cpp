@@ -1,25 +1,16 @@
 #ifndef POSITION_MAP_HPP
 #define POSITION_MAP_HPP
-
-#include <unordered_map>
-#include <string>
-
+#include <map>
+#include <random>
 class PositionMap {
-private:
-    std::unordered_map<std::string, int> posMap;
-
+    std::map<int, int> map;
+    std::mt19937 rng;
 public:
-    void setPosition(const std::string& id, int pos) {
-        posMap[id] = pos;
+    PositionMap() { rng.seed(std::random_device()()); }
+    int get_leaf(int id) {
+        if (!map.count(id)) map[id] = rng();
+        return map[id];
     }
-
-    int getPosition(const std::string& id) const {
-        auto it = posMap.find(id);
-        if (it != posMap.end()) {
-            return it->second;
-        }
-        return -1; // Not found
-    }
+    void update(int id, int leaf) { map[id] = leaf; }
 };
-
 #endif
