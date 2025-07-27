@@ -1,82 +1,68 @@
-#include "oram_tree.hpp"
-#include <cmath>
+#include "../include/oram_tree.hpp"
 #include <iostream>
-#include <algorithm>
 
-ORAMTree::ORAMTree(int h, int z) : height(h), Z(z) {
-    num_leaves = 1 << height; // 2^height
-    tree.resize((1 << (height + 1)) - 1); // Full binary tree node count
-    for (auto &bucket : tree)
+ORAMTree::ORAMTree(int depth, int Z) : depth(depth), Z(Z) {
+    int numBuckets = (1 << (depth + 1)) - 1;
+    tree.resize(numBuckets);
+    for (auto& bucket : tree) {
         bucket = Bucket(Z);
+    }
 }
 
-std::vector<Block> ORAMTree::read_path(int leaf) {
-    std::vector<Block> path;
-    int index = 0;
+int ORAMTree::getLeaf(int index) const {
+    return positionMap.getPosition(index);
+}
 
-    for (int level = 0; level <= height; level++) {
-        path.push_back(tree[index].get_blocks());
-        index = 2 * index + 1 + ((leaf >> (height - level)) & 1);
+void ORAMTree::access(int index, BlockOp op, const Block& inputBlock, Block& outputBlock) {
+    int oldLeaf = positionMap.getPosition(index);
+    int newLeaf = rand() % (1 << depth);
+    positionMap.setPosition(index, newLeaf);
+
+    // 1. Read path
+    std::vector<Block> pathBlocks;
+    readPath(oldLeaf, pathBlocks);
+
+    // 2. Add to stash
+    for (const auto& blk : pathBlocks) {
+        if (!blk.isDummy()) stash.addBlock(blk);
     }
 
-    return path;
+    // 3. Access or update block in stash
+    if (op == BlockOp::READ) {
+        outputBlock = stash.getBlock(index);
+    } else if (op == BlockOp::WRITE) {
+        stash.updateBlock(inputBlock);
+    }
+
+    // 4. Write path back
+    std::vector<Block> evictedBlocks;
+    stash.evictToPath(newLeaf, depth, Z, evictedBlocks);
+    writePath(oldLeaf, evictedBlocks);
 }
 
-void ORAMTree::write_path(int leaf, const std::vector<Block> &path_blocks) {
-    int index = 0;
-    int block_index = 0;
+void ORAMTree::readPath(int leaf, std::vector<Block>& blocks) {
+    int idx = 0;
+    for (int level = 0; level <= depth; ++level) {
+        Bucket& bucket = tree[idx];
+        const std::vector<Block>& bBlocks = bucket.getBlocks();
+        blocks.insert(blocks.end(), bBlocks.begin(), bBlocks.end());
 
-    for (int level = 0; level <= height; level++) {
-        std::vector<Block> new_bucket;
-        for (int i = 0; i < Z && block_index < path_blocks.size(); i++, block_index++) {
-            new_bucket.push_back(path_blocks[block_index]);
+        if (leaf & (1 << (depth - level - 1))) idx = 2 * idx + 2;
+        else idx = 2 * idx + 1;
+    }
+}
+
+void ORAMTree::writePath(int leaf, const std::vector<Block>& blocks) {
+    int idx = 0;
+    int blockIdx = 0;
+    for (int level = 0; level <= depth; ++level) {
+        Bucket& bucket = tree[idx];
+        bucket.clear();
+        for (int i = 0; i < Z && blockIdx < blocks.size(); ++i) {
+            bucket.addBlock(blocks[blockIdx++]);
         }
-        tree[index].set_blocks(new_bucket);
-        index = 2 * index + 1 + ((leaf >> (height - level)) & 1);
+
+        if (leaf & (1 << (depth - level - 1))) idx = 2 * idx + 2;
+        else idx = 2 * idx + 1;
     }
-}
-
-std::vector<int> ORAMTree::get_path(int leaf) {
-    std::vector<int> path;
-    int index = 0;
-
-    for (int level = 0; level <= height; level++) {
-        path.push_back(index);
-        index = 2 * index + 1 + ((leaf >> (height - level)) & 1);
-    }
-
-    return path;
-}
-
-Block ORAMTree::access(const std::string &op, int id, const std::string &data) {
-    int old_leaf = position_map.get_position(id);
-    int new_leaf = rand() % num_leaves;
-    position_map.set_position(id, new_leaf);
-
-    std::vector<int> path = get_path(old_leaf);
-    for (int node : path) {
-        std::vector<Block> bucket_blocks = tree[node].get_blocks();
-        for (const auto &blk : bucket_blocks) {
-            if (!blk.is_dummy)
-                stash.add_block(blk);
-        }
-    }
-
-    Block result;
-    if (op == "READ") {
-        result = stash.read_block(id);
-    } else if (op == "WRITE") {
-        Block new_block(id, data);
-        stash.write_block(new_block);
-        result = new_block;
-    }
-
-    // Refill buckets from stash (from bottom to root)
-    for (int i = path.size() - 1; i >= 0; i--) {
-        std::vector<Block> candidates = stash.get_blocks_on_path(path[i], height, Z);
-        tree[path[i]].set_blocks(candidates);
-        stash.remove_blocks(candidates);
-    }
-
-    return result;
 }
