@@ -7,9 +7,10 @@ class Stash {
 public:
     void add(const Block& b) { blocks[b.id] = b; }
     Block get(int id) { return blocks.at(id); }
-    bool contains(int id) { return blocks.count(id); }
+    bool contains(int id) const { return blocks.count(id); }
     void remove(int id) { blocks.erase(id); }
     auto begin() { return blocks.begin(); }
     auto end() { return blocks.end(); }
+    size_t size() const { return blocks.size(); }
 };
 #endif
