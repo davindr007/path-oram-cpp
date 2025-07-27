@@ -1,13 +1,19 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -O2 -Wall
+CXXFLAGS = -std=c++11 -O2 -Wall -Iinclude
+SRC_DIR = src
+BIN_DIR = bin
 
-all: client server
+all: $(BIN_DIR)/client $(BIN_DIR)/server
 
-client: client.cpp
+$(BIN_DIR)/client: $(SRC_DIR)/client.cpp
+	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-server: server.cpp
+$(BIN_DIR)/server: $(SRC_DIR)/server.cpp
+	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 clean:
-	rm -f client server
+	rm -rf $(BIN_DIR)
+
+.PHONY: all clean
