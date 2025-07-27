@@ -4,6 +4,8 @@
 #include "stash.hpp"
 #include "position_map.hpp"
 #include <vector>
+#include <algorithm>
+
 class ORAMTree {
     int levels;
     std::vector<std::vector<Bucket>> tree;
@@ -28,10 +30,12 @@ class ORAMTree {
                 for (int i = 0; i <= lvl; i++)
                     if (b_path[i] != path[i]) { in_subtree = false; break; }
                 
-                if (in_subtree && bucket.add(b))
+                if (in_subtree && !bucket.is_full()) {
+                    bucket.add(b);
                     it = stash.remove(b.id);
-                else
+                } else {
                     ++it;
+                }
             }
         }
     }
@@ -45,8 +49,10 @@ public:
     
     std::vector<int> read(int id) {
         int leaf = pmap.get_leaf(id);
+        auto path = get_path(leaf);
+        
         for (int lvl = 0; lvl < levels; lvl++)
-            for (auto& b : tree[lvl][get_path(leaf)[lvl]].remove_all())
+            for (auto& b : tree[lvl][path[lvl]].remove_all())
                 stash.add(b);
         
         pmap.update(id, leaf);
