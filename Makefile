@@ -1,19 +1,13 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -O2 -Wall -Iinclude
-SRC_DIR = src
-BIN_DIR = bin
+CXXFLAGS = -std=c++17 -Wall -O2
 
-all: $(BIN_DIR)/client $(BIN_DIR)/server
+SRC = src/main.cpp src/bucket.cpp src/stash.cpp src/oram_tree.cpp src/accessor.cpp src/position_map.cpp
+INC = -Iinclude
 
-$(BIN_DIR)/client: $(SRC_DIR)/client.cpp
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+TARGET = oram_simulator
 
-$(BIN_DIR)/server: $(SRC_DIR)/server.cpp
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+all:
+	$(CXX) $(CXXFLAGS) $(SRC) $(INC) -o $(TARGET)
 
 clean:
-	rm -rf $(BIN_DIR)
-
-.PHONY: all clean
+	rm -f $(TARGET)
