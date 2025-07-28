@@ -1,11 +1,19 @@
-#ifndef ACCESSOR_HPP
-#define ACCESSOR_HPP
+#pragma once
 #include "oram_tree.hpp"
-class ORAMAccessor {
-    ORAMTree oram;
+#include "position_map.hpp"
+#include "stash.hpp"
+#include <string>
+
+enum AccessType { READ, WRITE };
+
+class Accessor {
+private:
+    ORAMTree& tree;
+    PositionMap& pos_map;
+    Stash stash;
+
 public:
-    ORAMAccessor(int levels) : oram(levels) {}
-    std::vector<int> read(int id) { return oram.read(id); }
-    void write(int id, const std::vector<int>& data) { oram.write(id, data); }
+    Accessor(ORAMTree& t, PositionMap& p);
+    std::string access(int block_id, AccessType type, std::string new_data = "");
+
 };
-#endif
