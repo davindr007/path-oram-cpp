@@ -1,16 +1,18 @@
-#ifndef STASH_HPP
-#define STASH_HPP
+#pragma once
 #include "block.hpp"
-#include <unordered_map>
+#include <vector>
+#include <optional>
+
 class Stash {
-    std::unordered_map<int, Block> blocks;
+private:
+    std::vector<Block> buffer;
+
 public:
-    void add(const Block& b) { blocks[b.id] = b; }
-    Block get(int id) { return blocks.at(id); }
-    bool contains(int id) const { return blocks.count(id); }
-    void remove(int id) { blocks.erase(id); }
-    auto begin() { return blocks.begin(); }
-    auto end() { return blocks.end(); }
-    size_t size() const { return blocks.size(); }
+    void addBlock(const Block& block);
+    std::optional<Block> getBlock(int id);
+    void removeBlock(int id);
+    std::vector<Block> getAllBlocks() const;
+
+    void print() const;
 };
-#endif
+
