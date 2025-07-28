@@ -1,9 +1,11 @@
-#ifndef BLOCK_HPP
-#define BLOCK_HPP
-#include <vector>
+#pragma once
+#include <string>
+
 struct Block {
-    int id = -1; // -1 for dummy blocks
-    std::vector<int> data;
-    int leaf = 0;
+    int id;
+    std::string data;
+    bool is_dummy;
+
+    Block(int id = -1, std::string d = "", bool dummy = true)
+        : id(id), data(d), is_dummy(dummy) {}
 };
-#endif
